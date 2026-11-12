@@ -26,7 +26,8 @@
  *       search "的"                         : 24 部/页, maxPage=101（站点分页条 101）
  *       loadInfo 催眠手机                   : 93 话完整（站点最新 第93话, 完整性一致）
  *       loadEp 第93话                        : 168 张图（1..168 连续, 全部绝对 URL）
- *   - 云端 source validate: 通过（官方输出 "Valid shenqimanhua (神奇漫画) 1.0.0"）
+ *   - 云端 source validate: 通过（官方输出 "Valid shenqimanhua (神奇漫画) 1.0.0"，
+ *       单标签版复验 run 43250193433，commit d00874b）
  *   - 实机验证: 待用户导入 Venera
  */
 
@@ -35,7 +36,7 @@ class ShenQiManHua extends ComicSource {
 
     key = "shenqimanhua"
 
-    version = "1.0.0"
+    version = "1.0.1"
 
     minAppVersion = "1.6.0"
 
