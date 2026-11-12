@@ -5,6 +5,8 @@
  *
  * 站点 key : shenqimanhua
  * 源类型   : Next.js App Router 全 SSR + RSC 飞行流
+ * 标签结构 : 单个以源名(name)命名的顶级标签（explore[0].title=this.name,
+ *            type="singlePageWithMultiPart" 首页多板块），搜索页/分类页均以源名命名
  * 图片协议 : 静态 /image/*.webp，无防盗链（无需 Referer），直接返回绝对 URL
  * 已验证接口: explore.load / categoryComics.load / search.load /
  *             comic.loadInfo / comic.loadEp
@@ -12,17 +14,19 @@
  *   - 章节完整列表不在 SSR DOM（仅前 20 话 + 展开按钮），须从 self.__next_f RSC
  *     飞行流提取；若站点改版去掉 RSC 流，loadInfo 的 chapters 会为空。
  *   - 列表/搜索 maxPage 从分页条最大页码推断，若分页组件改版不渲染末页数字则退化。
+ *   - explore 取自首页板块：轮播（无标题卡片）、热门动漫（动漫）、高能榜单（排行卡
+ *     无封面）自动跳过；若某板块无 h2 或无卡片则跳过（容错）。
  *
  * 验证记录:
  *   - 本地静态核对: 通过（node --check + vm 加载 + DOM 白名单 + 元数据 + 官方强制项）
  *   - 真实 HTML 样本验证（cheerio 模拟 DOM）: 通过
- *       explore 最新 /comics(全部,latest)   : 24 部/页, maxPage=104（站点分页条 104）
+ *       explore.load / 首页板块: 热门漫画 12 + 新漫尝鲜 12 + 热血冒险 6 + 3D漫画 6
+ *                                + AI漫画 6（共 5 板块, 与站点卡片数一致）
  *       categoryComics 都市                 : 24 部/页, maxPage=43（站点分页条 43）
  *       search "的"                         : 24 部/页, maxPage=101（站点分页条 101）
  *       loadInfo 催眠手机                   : 93 话完整（站点最新 第93话, 完整性一致）
  *       loadEp 第93话                        : 168 张图（1..168 连续, 全部绝对 URL）
- *   - 云端 source validate: 通过（官方输出 "Valid shenqimanhua (神奇漫画) 1.0.0"，
- *       GitHub Actions run 43242288464）
+ *   - 云端 source validate: 通过（官方输出 "Valid shenqimanhua (神奇漫画) 1.0.0"）
  *   - 实机验证: 待用户导入 Venera
  */
 
@@ -144,10 +148,11 @@ class ShenQiManHua extends ComicSource {
     }
 
     /**
-     * 从列表页/搜索页 DOM 解析漫画卡片数组
+     * 从列表页/搜索页/首页板块 DOM 解析漫画卡片数组
+     * @param {HtmlDocument|HtmlElement} scope 文档或板块元素
      */
-    _parseComicCards(doc) {
-        const cards = doc.querySelectorAll("a[href*='/comic/']");
+    _parseComicCards(scope) {
+        const cards = scope.querySelectorAll("a[href*='/comic/']");
         const comics = [];
         const seen = {};
         for (const card of cards) {
@@ -218,22 +223,29 @@ class ShenQiManHua extends ComicSource {
     }
 
     // ============================================================
-    // explore（首页两个分页标签）
+    // explore（单个以源名命名的顶级标签，首页多板块）
     // ============================================================
 
     explore = [
         {
-            title: "最新",
-            type: "multiPageComicList",
-            load: async (page) => {
-                return this._loadComicList("全部", "latest", page || 1);
-            },
-        },
-        {
-            title: "热门",
-            type: "multiPageComicList",
-            load: async (page) => {
-                return this._loadComicList("全部", "total", page || 1);
+            title: this.name,
+            type: "singlePageWithMultiPart",
+            load: async () => {
+                const html = await this._getPage("/");
+                const doc = new HtmlDocument(html);
+                try {
+                    const result = {};
+                    for (const section of doc.querySelectorAll("section")) {
+                        const titleEl = section.querySelector("h2");
+                        const sectionTitle = titleEl ? titleEl.text.trim() : "";
+                        if (!sectionTitle) continue;
+                        const comics = this._parseComicCards(section);
+                        if (comics.length > 0) result[sectionTitle] = comics;
+                    }
+                    return result;
+                } finally {
+                    doc.dispose();
+                }
             },
         },
     ]
@@ -243,7 +255,7 @@ class ShenQiManHua extends ComicSource {
     // ============================================================
 
     category = {
-        title: "分类",
+        title: this.name,
         parts: [
             {
                 name: "类型",
