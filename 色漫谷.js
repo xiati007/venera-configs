@@ -635,3 +635,4 @@ class SemanguSource extends ComicSource {
   };
 }
 // 类名以 Source 结尾，Venera 通过全局类识别加载，无需 module.exports
+// cloud validate trigger 1794487044
