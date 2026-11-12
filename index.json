@@ -418,5 +418,11 @@
         "fileName": "comick.js",
         "key": "comick",
         "version": "1.0.1"
+    },
+    {
+        "name": "神奇漫画",
+        "fileName": "shenqimanhua.js",
+        "key": "shenqimanhua",
+        "version": "1.0.0"
     }
 ]
