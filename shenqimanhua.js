@@ -8,7 +8,6 @@
  * 图片协议 : 静态 /image/*.webp，无防盗链（无需 Referer），直接返回绝对 URL
  * 已验证接口: explore.load / categoryComics.load / search.load /
  *             comic.loadInfo / comic.loadEp
- * 图片协议   : 静态 /image/*.webp，无防盗链（curl 无 Referer 仍 HTTP 200）
  * 风险点   :
  *   - 章节完整列表不在 SSR DOM（仅前 20 话 + 展开按钮），须从 self.__next_f RSC
  *     飞行流提取；若站点改版去掉 RSC 流，loadInfo 的 chapters 会为空。
@@ -22,7 +21,8 @@
  *       search "的"                         : 24 部/页, maxPage=101（站点分页条 101）
  *       loadInfo 催眠手机                   : 93 话完整（站点最新 第93话, 完整性一致）
  *       loadEp 第93话                        : 168 张图（1..168 连续, 全部绝对 URL）
- *   - 云端 source validate: 待验证
+ *   - 云端 source validate: 通过（官方输出 "Valid shenqimanhua (神奇漫画) 1.0.0"，
+ *       GitHub Actions run 43242288464）
  *   - 实机验证: 待用户导入 Venera
  */
 
