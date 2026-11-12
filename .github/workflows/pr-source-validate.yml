@@ -22,7 +22,12 @@ jobs:
         uses: dart-lang/setup-dart@v1
 
       - name: Fetch base branch
-        run: git fetch origin "${{ github.base_ref }}"
+        run: |
+          if [ -n "${{ github.base_ref }}" ]; then
+            git fetch origin "${{ github.base_ref }}"
+          else
+            echo "push event: base = ${{ github.event.before }}"
+          fi
 
       - name: Clone latest venera_cli
         run: git clone --depth 1 https://github.com/venera-app/venera_cli.git /tmp/venera_cli
@@ -38,7 +43,11 @@ jobs:
       - name: Collect changed config files
         id: changed-configs
         run: |
-          node scripts/list-changed-configs.js > /tmp/changed-configs.txt
+          if [ -n "${{ github.base_ref }}" ]; then
+            node scripts/list-changed-configs.js > /tmp/changed-configs.txt
+          else
+            node scripts/list-changed-configs.js "${{ github.event.before }}" > /tmp/changed-configs.txt
+          fi
           count=$(wc -l < /tmp/changed-configs.txt | tr -d ' ')
           echo "count=$count" >> "$GITHUB_OUTPUT"
 
