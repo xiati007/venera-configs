@@ -2,6 +2,7 @@ name: PR Source Validate
 
 on:
   pull_request:
+  push:
 
 jobs:
   validate-sources:
