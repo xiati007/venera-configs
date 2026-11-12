@@ -400,5 +400,23 @@
         "fileName": "nnhm7.js",
         "key": "nnhm7",
         "version": "1.0.0"
+    },
+    {
+        "name": "漫网",
+        "fileName": "manwang.js",
+        "key": "manwang",
+        "version": "1.2.0"
+    },
+    {
+        "name": "CCC追漫台",
+        "fileName": "ccc.js",
+        "key": "ccc",
+        "version": "1.0.1"
+    },
+    {
+        "name": "CCC追漫台",
+        "fileName": "comick.js",
+        "key": "comick",
+        "version": "1.0.1"
     }
 ]
