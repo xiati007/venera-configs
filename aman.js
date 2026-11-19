@@ -52,7 +52,7 @@
 class AmanComicSource extends ComicSource {
   name = "A漫";
   key = "aman";
-  version = "1.0.1";
+  version = "1.0.0";
   minAppVersion = "1.6.0";
   // 动态域名源（域名由用户在设置中输入），入口元数据留空（与 mwwz/dmmpic 同约定）。
   url = "";
@@ -671,3 +671,4 @@ class AmanComicSource extends ComicSource {
     },
   };
 }
+
